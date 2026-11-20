@@ -1,162 +1,632 @@
 <!DOCTYPE html>
-<!-- oss-template-2026:placeholder （この目印で，scripts/check.sh が「準備中」のページかどうかを見分けます） -->
-<!--
-  テンプレートの「準備中」のページです．
-  このページが https://ユーザー名.github.io/ に表示されたら，GitHub Pages の設定は成功です．
-  第7回の実習4で，このファイルを第6回で作った index.html に置きかえます．
--->
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>準備中</title>
-  <style>
-    /* ===== 色の設定 ===== */
-    :root {
-      --main-color: #2e7d32;  /* メインの色（見出し・番号） */
-      --bg-color: #f5f8f5;    /* ページの背景の色 */
-      --card-color: #ffffff;  /* カードの背景の色 */
-      --text-color: #222222;  /* 文字の色 */
-      --sub-color: #666666;   /* 補足の文字の色 */
-      --line-color: #dfe6df;  /* 区切り線の色 */
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第5回：Gitの基本操作（add と commit）</title>
+    <style>
+        /* ==========================================
+           全体のリセットとベーススタイル
+           ================================---------- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    /* パソコンやスマートフォンがダークモードのときの色 */
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --main-color: #81c784;
-        --bg-color: #121512;
-        --card-color: #1e231e;
-        --text-color: #e8ece8;
-        --sub-color: #a0a8a0;
-        --line-color: #2f362f;
-      }
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.7;
+            color: #24292e;
+            background-color: #f6f8fa;
+            padding: 20px;
+        }
 
-    /* ページ全体：カードを画面のまんなかに置く */
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px 16px;
-      box-sizing: border-box;
-      font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
-      line-height: 1.8;
-      color: var(--text-color);
-      background: var(--bg-color);
-    }
+        /* コンテナレイアウト（スマホ対応の中央寄せ幅広コンテナ） */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
 
-    /* まんなかのカード */
-    main {
-      width: 100%;
-      max-width: 600px;
-      padding: 32px 28px;
-      background: var(--card-color);
-      border-top: 6px solid var(--main-color);
-      border-radius: 12px;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    }
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+        }
 
-    h1 {
-      margin: 0 0 4px;
-      font-size: clamp(1.3rem, 6vw, 1.6rem);  /* スマートフォンでは少し小さくする */
-      line-height: 1.4;
-      color: var(--main-color);
-    }
+        /* ==========================================
+           タイポグラフィとセクション
+           ================================---------- */
+        h1 {
+            font-size: 1.8rem;
+            border-bottom: 2px solid #eaecef;
+            padding-bottom: 10px;
+            margin-bottom: 24px;
+            color: #24292e;
+        }
 
-    h2 {
-      margin: 28px 0 8px;
-      padding-bottom: 4px;
-      font-size: 1.05rem;
-      border-bottom: 1px solid var(--line-color);
-    }
+        h2 {
+            font-size: 1.4rem;
+            border-bottom: 1px solid #eaecef;
+            padding-bottom: 6px;
+            margin-top: 40px;
+            margin-bottom: 16px;
+            color: #24292e;
+        }
 
-    /* 「設定は成功」のバッジ */
-    .badge {
-      display: inline-block;
-      margin: 8px 0 0;
-      padding: 2px 12px;
-      font-size: 0.9rem;
-      font-weight: bold;
-      color: var(--card-color);
-      background: var(--main-color);
-      border-radius: 999px;
-    }
+        h3 {
+            font-size: 1.1rem;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            color: #24292e;
+        }
 
-    /* 「次にやること」の番号つきリスト */
-    ol {
-      margin: 0;
-      padding-left: 1.4em;
-    }
-    li {
-      margin-bottom: 6px;
-    }
-    li::marker {
-      font-weight: bold;
-      color: var(--main-color);
-    }
+        p {
+            margin-bottom: 16px;
+        }
 
-    /* コマンドの見た目 */
-    code {
-      padding: 1px 6px;
-      font-family: "SFMono-Regular", Consolas, monospace;
-      font-size: 0.88em;
-      background: var(--bg-color);
-      border-radius: 4px;
-      white-space: nowrap;  /* コマンドの途中で折り返さない */
-    }
+        ul, ol {
+            margin-bottom: 16px;
+            padding-left: 24px;
+        }
 
-    /* 補足の小さな文字 */
-    .sub {
-      font-size: 0.9rem;
-      color: var(--sub-color);
-    }
+        li {
+            margin-bottom: 6px;
+        }
 
-    /* いちばん下の小さな文字 */
-    footer {
-      margin-top: 28px;
-      padding-top: 12px;
-      font-size: 0.8rem;
-      color: var(--sub-color);
-      border-top: 1px solid var(--line-color);
-    }
-    a {
-      color: var(--main-color);
-    }
-  </style>
+        strong {
+            font-weight: 600;
+        }
+
+        /* ==========================================
+           コードブロックとインラインコード
+           ================================---------- */
+        code {
+            font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier, monospace;
+            font-size: 85%;
+            background-color: rgba(27, 31, 35, 0.05);
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+        }
+
+        pre {
+            background-color: #f6f8fa;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            padding: 16px;
+            overflow-x: auto;
+            margin-bottom: 16px;
+            font-size: 85%;
+            line-height: 1.45;
+        }
+
+        pre code {
+            background-color: transparent;
+            padding: 0;
+            border: none;
+        }
+
+        /* ==========================================
+           引用・注意書きブロック
+           ================================---------- */
+        blockquote {
+            padding: 0 1em;
+            color: #6a737d;
+            border-left: 0.25em solid #dfe2e5;
+            margin: 0 0 16px 0;
+        }
+
+        /* ==========================================
+           テーブル（表）のスタイル
+           ================================---------- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            border: 1px solid #dfe2e5;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f6f8fa;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        /* ==========================================
+           区切り線
+           ================================---------- */
+        hr {
+            border: 0;
+            height: 1px;
+            background-color: #e1e4e8;
+            margin: 32px 0;
+        }
+    </style>
 </head>
 <body>
-  <main>
-    <h1>このサイトは準備中です</h1>
-    <p class="badge">GitHub Pages の設定 OK</p>
-    <p>このページが表示されていれば，あなたのリポジトリは正しく公開されています．
-      あとは，このページを自分のサイトに置きかえるだけです．</p>
+    <div class="container">
+        <!-- ヘッダーおよびタイトル -->
+        <h1>第5回：Gitの基本操作（add と commit）</h1>
 
-    <h2>次にやること</h2>
-    <ol>
-      <li>このリポジトリを，SSHのURLで <code>git clone</code> する</li>
-      <li><code>index.html</code> を，第6回で作ったサイトに置きかえる</li>
-      <li><code>bash scripts/check.sh</code> で，公開前のチェックをする</li>
-      <li><code>git add</code> → <code>git commit</code> → <code>git push origin main</code> する</li>
-      <li>数分待ってから，このページを再読み込みする</li>
-    </ol>
-    <p class="sub">再読み込みしても変わらないときは，強制再読み込み（Windows：Ctrl + F5，Mac：Command + Shift + R）を試しましょう．</p>
+        <!-- この回で学ぶこと -->
+        <h2>この回で学ぶこと</h2>
+        <p>この回では，Gitの基本的な操作である <code>git add</code> と <code>git commit</code> について学びます．<br>
+        これらのコマンドを使うことで，自分の作業を記録し，バージョン管理ができるようになります．</p>
 
-    <h2>公開する前に</h2>
-    <ul>
-      <li>本名のフルネーム・学籍番号・住所・電話番号・メールアドレスが入っていないか</li>
-      <li>自己紹介に書いていないことを，AIが付け足していないか</li>
-    </ul>
-    <p class="sub">このリポジトリは Public です．サイトだけでなく，ファイルの中身やコミットの履歴も，誰でも見ることができます．</p>
+        <p>題材として，自己紹介ファイル <code>PROFILE.md</code> を書きます．<br>
+        ここで書いた <code>PROFILE.md</code> は，<strong>第6回で生成AI（ChatGPT・Claude・Gemini・Copilot など好きなもの）を使って，HTML/CSSのプロフィールサイトを作るときの素材</strong>になります．<br>
+        しっかり書いておくほど，次回のサイトがあなたらしくなります．</p>
 
-    <footer>
-      拓殖大学工学部『オープンソースソフトウェア』2026年度<br>
-      <a href="https://github.com/tomohitoy/oss-practice-2026/blob/main-07/chap07/README.md">第7回の資料</a>
-      ・
-      <a href="https://github.com/tomohitoy/oss-template-2026">テンプレート（tomohitoy/oss-template-2026）</a>
-    </footer>
-  </main>
+        <h3>今日のゴール</h3>
+        <ul>
+            <li>[ ] <code>PROFILE.md</code> に自己紹介を書き，<strong>2回以上</strong>コミットする</li>
+            <li>[ ] <code>git add</code> や <code>git commit</code> をするたびに，<code>.git/objects</code> の中身が増えることを確かめる</li>
+            <li>[ ] <code>git cat-file</code> でコミットの中身をたどり，自分が書いた自己紹介を取り出す</li>
+        </ul>
+
+        <!-- Gitとは？ -->
+        <h2>Gitとは？</h2>
+        <p>Gitは，ファイルの変更履歴を記録し，管理するためのツールです．<br>
+        まるでゲームのセーブポイントのように，作業の節目でファイルの状態を保存できます．</p>
+
+        <p>Gitでは，ファイルが次の3つの場所を移動していきます．</p>
+
+<pre><code> 作業ディレクトリ           ステージングエリア             リポジトリ（.git）
+（ファイルを編集する）  ──→ （次のコミットに入れる候補） ──→ （履歴として保存）
+                  git add                      git commit</code></pre>
+
+        <ul>
+            <li><strong>作業ディレクトリ</strong>：あなたがエディタでファイルを編集する場所</li>
+            <li><strong>ステージングエリア</strong>：「次のコミットに入れるもの」を置いておく場所</li>
+            <li><strong>リポジトリ（<code>.git</code> フォルダ）</strong>：コミットした履歴がすべて保存される場所</li>
+        </ul>
+
+        <!-- 実習の流れ -->
+        <h2>実習の流れ</h2>
+        <ol>
+            <li>リポジトリを取得する（<code>git clone</code>）</li>
+            <li><code>.git/objects</code> の中身を見ておく</li>
+            <li><code>PROFILE.md</code> に基本情報を書く</li>
+            <li><code>git status</code> で変更を確認</li>
+            <li><code>git add PROFILE.md</code> でステージング</li>
+            <li><code>git commit -m "基本情報を追加"</code> でコミット</li>
+            <li>残りを書いて，もう一度 add → commit</li>
+            <li><code>git log --oneline</code> で履歴を確認</li>
+            <li><code>git cat-file</code> でコミットの仕組みをのぞく</li>
+        </ol>
+
+        <p>それでは，順番に進めていきましょう．</p>
+
+        <hr>
+
+        <!-- 1. リポジトリを取得する -->
+        <h2>1. リポジトリを取得する（git clone）</h2>
+        <p>GitHub上の「Download ZIP」などでファイルをダウンロードすると，リポジトリの履歴やメタデータが入っている <code>.git</code> フォルダは含まれません．<br>
+        そのため，必ず <code>git clone</code> でリポジトリをクローンしてください．</p>
+
+<pre><code>git clone https://github.com/tomohitoy/oss-practice-2026.git</code></pre>
+
+        <p>クローンしたフォルダに移動します：</p>
+<pre><code>cd oss-practice-2026</code></pre>
+
+        <p>いまいるブランチを確認します：</p>
+<pre><code>git branch</code></pre>
+
+        <p><code>* main-05</code> と表示されればOKです．<br>
+        違うものが表示された場合は，次のコマンドで第5回用のブランチに移動してください：</p>
+<pre><code>git switch main-05</code></pre>
+
+        <blockquote>
+            ブランチについては第6回で詳しく学びます．今は「第5回用の作業場所」と考えておけば大丈夫です．
+        </blockquote>
+
+        <p>最後に，この章のフォルダに移動します：</p>
+<pre><code>cd chap05</code></pre>
+
+        <!-- 2. .git/objects の中身を見ておく -->
+        <h2>2. <code>.git/objects</code> の中身を見ておく</h2>
+        <p>Gitは，すべての変更履歴を <code>.git/objects</code> というフォルダに保存しています．<br>
+        あとで比べるために，<strong>何も変更していない今の状態</strong>を見ておきましょう．</p>
+
+<pre><code>ls ../.git/objects</code></pre>
+
+        <p>表示例：</p>
+<pre><code>info
+pack</code></pre>
+
+        <p><strong>なぜ <code>../</code> が付くの？</strong><br>
+        <code>.git</code> フォルダは，リポジトリの一番上（<code>oss-practice-2026</code> フォルダ）にだけあります．<br>
+        いまは <code>chap05</code> フォルダの中にいるので，<code>..</code>（1つ上のフォルダ）を付けて指定しています．</p>
+
+        <p>クローンした直後は，受け取った履歴がすべて <code>pack</code> フォルダの中にまとめて保存されているので，<code>info</code> と <code>pack</code> しか見えません．<br>
+        この後，<code>git add</code> や <code>git commit</code> をするたびに，ここに新しいフォルダが増えていきます．</p>
+
+        <!-- 3. PROFILE.md に基本情報を書く -->
+        <h2>3. <code>PROFILE.md</code> に基本情報を書く</h2>
+        <p>VS Code などのエディタで <code>chap05/PROFILE.md</code> を開き，まずは <strong>「基本情報」の部分だけ</strong> 書いて保存してください．<br>
+        残りは手順7で書きます（2回に分けてコミットするためです）．</p>
+
+        <blockquote>
+            <strong>注意</strong>：<code>PROFILE.md</code> は，次回AIに渡したり，GitHubで公開したりします．<br>
+            フルネームの本名・学籍番号・住所・電話番号など，公開したくない情報は書かないでください（ニックネームでOK）．
+        </blockquote>
+
+        <!-- 4. 変更を確認する -->
+        <h2>4. 変更を確認する（<code>git status</code>）</h2>
+        <p>どのファイルが変更されているかを確認します．</p>
+
+<pre><code>git status</code></pre>
+
+        <p>表示例：</p>
+<pre><code>On branch main-05
+Your branch is up to date with 'origin/main-05'.
+
+Changes not staged for commit:
+  (use "git add &lt;file&gt;..." to update what will be committed)
+  (use "git restore &lt;file&gt;..." to discard changes in working directory)
+  modified:   PROFILE.md
+
+no changes added to commit (use "git add" and/or "git commit -a")</code></pre>
+
+        <p><code>git status</code> の表示は，次のように読みます：</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>表示</th>
+                    <th>意味</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>Changes not staged for commit:</code>（赤字）</td>
+                    <td>変更したけれど，まだ <code>git add</code> していないファイル</td>
+                </tr>
+                <tr>
+                    <td><code>Changes to be committed:</code>（緑字）</td>
+                    <td><code>git add</code> 済みで，コミット待ちのファイル</td>
+                </tr>
+                <tr>
+                    <td><code>Untracked files:</code></td>
+                    <td>Gitがまだ管理していない，新しく作ったファイル</td>
+                </tr>
+                <tr>
+                    <td><code>nothing to commit, working tree clean</code></td>
+                    <td>すべての変更がコミット済み</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>どこを変更したか詳しく見たいときは，<code>git diff</code> を使います（<code>q</code> キーで終了）．</p>
+
+        <!-- 5. 変更をステージングする -->
+        <h2>5. 変更をステージングする（<code>git add</code>）</h2>
+        <p>ファイルの変更をコミットする準備 ── これを「ステージング」と言います．</p>
+
+<pre><code>git add PROFILE.md</code></pre>
+
+        <p><strong>ステージングとは？</strong><br>
+        ステージングは，写真を撮る前に「どの人を写真に含めるか」を決めるようなものです．<br>
+        変更したファイルの中から，次のコミットに含めたいものだけを選びます．</p>
+
+        <blockquote>
+            <code>git add .</code> と書くと，今いるフォルダ以下のすべての変更をまとめてステージングできます．<br>
+            ただし関係ないファイルまで入ってしまうことがあるので，慣れるまではファイル名を指定しましょう．
+        </blockquote>
+
+        <h3>👀 <code>.git/objects</code> をのぞいてみよう</h3>
+<pre><code>ls ../.git/objects</code></pre>
+
+        <p>表示例：</p>
+<pre><code>53
+info
+pack</code></pre>
+
+        <p>2文字のフォルダが1つ増えました！<br>
+        <code>git add</code> した瞬間に，Gitは <code>PROFILE.md</code> の<strong>中身</strong>を <code>.git/objects</code> に保存しています．<br>
+        このように，ファイルの中身を保存したものを <strong>blob（ブロブ）</strong> と呼びます．</p>
+
+        <p>もう一度 <code>git status</code> を実行して，<code>PROFILE.md</code> が緑字の <code>Changes to be committed:</code> に移ったことも確認しましょう．</p>
+
+        <!-- 6. 変更を記録する -->
+        <h2>6. 変更を記録する（<code>git commit</code>）</h2>
+
+        <h3>コミットの前に（初回だけ）：名前とメールアドレスの設定</h3>
+        <p>コミットには「誰が変更したか」が記録されます．まず，名前が設定されているか確認しましょう．</p>
+
+<pre><code>git config --global user.name</code></pre>
+
+        <p>何も表示されなかった場合は，名前とメールアドレスを設定します．</p>
+
+<pre><code>git config --global user.name "あなたの名前"</code></pre>
+
+<pre><code>git config --global user.email "あなたのメールアドレス"</code></pre>
+
+        <blockquote>
+            ここで設定した名前とメールアドレスは，コミットの中に記録されます（手順9で実際に確認します）．<br>
+            GitHubに公開すると誰でも見られるので，公開してよいものを使いましょう．
+        </blockquote>
+
+        <p>設定をしないままコミットすると，次の警告が出ます．この警告が出たら，上の設定をしてからもう一度コミットしてください．</p>
+
+<pre><code>Author identity unknown
+
+*** Please tell me who you are.
+
+Run
+
+  git config --global user.email "you@example.com"
+  git config --global user.name "Your Name"
+
+to set your account's default identity.
+Omit --global to set the identity only in this repository.</code></pre>
+
+        <h3>コミットする</h3>
+        <p>ステージングした変更を，履歴として記録します．</p>
+
+<pre><code>git commit -m "基本情報を追加"</code></pre>
+
+        <p><strong><code>-m</code> オプション</strong>について：</p>
+        <ul>
+            <li><code>-m</code> は "message"（メッセージ）の略です</li>
+            <li>このオプションを使うと，コマンドライン上で直接コミットメッセージを書けます</li>
+            <li>メッセージには，「何を変更したか」を簡潔に書きます</li>
+        </ul>
+
+        <p><strong>良いコミットメッセージの書き方</strong>：</p>
+        <ul>
+            <li>何をしたかを明確に書く</li>
+            <li>日本語でも英語でもOK</li>
+            <li>短く，わかりやすく（1行程度）</li>
+        </ul>
+
+        <h3>👀 もう一度 <code>.git/objects</code> をのぞいてみよう</h3>
+<pre><code>ls ../.git/objects</code></pre>
+
+        <p>表示例：</p>
+<pre><code>29
+53
+63
+fe
+info
+pack</code></pre>
+
+        <p>今度は3つ増えました．増えたのは次のものです：</p>
+        <ul>
+            <li><strong>commit</strong>：コミットそのもの（誰が・いつ・なぜ変更したか）</li>
+            <li><strong>tree</strong>：フォルダの中身の一覧（<code>chap05</code> フォルダ用と，リポジトリ全体用の2つ）</li>
+        </ul>
+
+        <p>つまり，<strong><code>git add</code> で中身（blob）が保存され，<code>git commit</code> でそれをまとめる tree と commit が作られる</strong>，という仕組みになっています．</p>
+
+        <h3>コミット後の <code>git status</code></h3>
+<pre><code>git status</code></pre>
+
+        <p>表示例：</p>
+<pre><code>On branch main-05
+Your branch is ahead of 'origin/main-05' by 1 commit.
+  (use "git push" to publish your local commits)
+
+nothing to commit, working tree clean</code></pre>
+
+        <p><code>ahead of 'origin/main-05' by 1 commit</code> は，「GitHub上のリポジトリより，あなたのパソコンのほうが1コミット進んでいる」という意味です．<br>
+        コミットは，まだあなたのパソコンの中にだけ保存されています（GitHubに送る <code>git push</code> は第7回で学びます）．</p>
+
+        <!-- 7. 残りを書いて、もう一度コミットする -->
+        <h2>7. 残りを書いて，もう一度コミットする</h2>
+        <p><code>PROFILE.md</code> の残りの項目（キャッチコピー，趣味，プログラミング経験など）を書いて保存したら，もう一度同じ流れでコミットします．</p>
+
+<pre><code>git status</code></pre>
+
+<pre><code>git add PROFILE.md</code></pre>
+
+<pre><code>git commit -m "趣味などを追加"</code></pre>
+
+        <p>セーブポイントは何回作ってもかまいません．<br>
+        「項目を1つ書き終えた」など，区切りのいいところでコミットするのがおすすめです．</p>
+
+        <!-- 8. コミット履歴を見る -->
+        <h2>8. コミット履歴を見る（<code>git log</code>）</h2>
+
+        <h3><code>git log --oneline</code></h3>
+        <p>コミット履歴を1行ずつ，簡潔に表示します．</p>
+
+<pre><code>git log --oneline</code></pre>
+
+        <p>表示例：</p>
+<pre><code>89e9b5e 趣味などを追加
+6338599 基本情報を追加
+e8dea5b 第5回の講義資料を追加
+28e28bc Initial commit</code></pre>
+
+        <ul>
+            <li>左側の文字列（<code>89e9b5e</code>）は「コミットハッシュ」と呼ばれる，コミットを識別するIDです</li>
+            <li>右側はコミットメッセージです</li>
+            <li>上にあるものほど新しいコミットです．下のほうにあるのは，先生が作ったコミットです</li>
+        </ul>
+
+        <blockquote>
+            ハッシュの値は，人によって違います．以降の例では，<strong>自分の画面に表示されたハッシュ</strong>に置きかえて実行してください．
+        </blockquote>
+
+        <h3><code>git log -1</code></h3>
+        <p>最新のコミット1件だけを詳しく表示します．</p>
+
+<pre><code>git log -1</code></pre>
+
+        <p>表示例：</p>
+<pre><code>commit 89e9b5e6422d0bfd537bcf687c0a624c24dc3114
+Author: Taku Shoku &lt;taku@example.com&gt;
+Date:   Sat Oct 24 19:06:40 2026 +0900
+
+    趣味などを追加</code></pre>
+
+        <p>本当のコミットハッシュは40文字あります．<code>--oneline</code> では，その先頭7文字だけを表示しています．</p>
+
+        <!-- 9. コミットの仕組みをのぞいてみよう -->
+        <h2>9. コミットの仕組みをのぞいてみよう</h2>
+
+        <h3>9-1. コミットハッシュと <code>.git/objects</code> の関係</h3>
+        <p>コミットハッシュの <strong>先頭2文字</strong> が <code>.git/objects</code> の中のフォルダ名，<strong>残りの38文字</strong> がファイル名になっています．</p>
+
+        <p>例えば，コミットハッシュが <code>89e9b5e...</code> なら：</p>
+<pre><code>ls ../.git/objects/89</code></pre>
+
+        <p>表示例：</p>
+<pre><code>e9b5e6422d0bfd537bcf687c0a624c24dc3114</code></pre>
+
+        <p><code>git log -1</code> で表示された40文字のハッシュと見比べてみましょう．<br>
+        手順6で増えたフォルダの1つ <code>63</code> も，1回目のコミット <code>6338599</code> の先頭2文字だったことがわかります．</p>
+
+        <h3>9-2. <code>git cat-file</code> でコミットの中身を見る</h3>
+        <p>オブジェクトの種類を確認します：</p>
+<pre><code>git cat-file -t 89e9b5e</code></pre>
+
+        <p>結果は <code>commit</code>，<code>tree</code>，<code>blob</code>（ファイルの中身）のいずれかになります．ここでは <code>commit</code> と表示されます．</p>
+
+        <p>コミットの中身を表示します：</p>
+<pre><code>git cat-file -p 89e9b5e</code></pre>
+
+        <p>表示例：</p>
+<pre><code>tree a752a0049f31be4560abadbc310fe32632f3d252
+parent 63385993454cceba903013ddd49cf2cc5b731083
+author Taku Shoku &lt;taku@example.com&gt; 1792836400 +0900
+committer Taku Shoku &lt;taku@example.com&gt; 1792836400 +0900
+
+趣味などを追加</code></pre>
+
+        <ul>
+            <li><strong>tree</strong>：そのコミット時点でのファイルツリー（フォルダ構造）</li>
+            <li><strong>parent</strong>：1つ前のコミット</li>
+            <li><strong>author</strong>：誰が変更したか（手順6で設定した名前とメールアドレスです）</li>
+            <li><strong>committer</strong>：誰がコミットしたか</li>
+            <li><strong>コミットメッセージ</strong>：なぜ変更したか</li>
+        </ul>
+
+        <blockquote>
+            <code>1792836400</code> は，1970年1月1日から数えた秒数で表した日時です．
+        </blockquote>
+
+        <h3>9-3. tree → blob とたどって，自分の自己紹介を取り出す</h3>
+        <p>コミットは，次のようにつながっています．</p>
+
+<pre><code>commit 89e9b5e「趣味などを追加」
+ ├─ tree a752a00 ………… リポジトリ全体のフォルダ
+ │    ├─ blob d0daf22   LICENSE
+ │    ├─ blob c0d68e6   README.md
+ │    └─ tree 3d93078   chap05/
+ │         ├─ blob 4f85fe5   PROFILE.md   ← あなたの自己紹介
+ │         └─ blob 07ca40d   README.md
+ └─ parent 6338599 ……… 1つ前のコミット「基本情報を追加」</code></pre>
+
+        <p>実際にたどってみましょう．<br>
+        まず，コミットの <code>tree</code> に書かれていたハッシュを見ます：</p>
+<pre><code>git cat-file -p a752a00</code></pre>
+
+        <p>表示例：</p>
+<pre><code>100644 blob d0daf22f5c1640c3ac764729f62edce37f550837  LICENSE
+100644 blob c0d68e6f0da2f6e6cfed97b74937370c7686dc65  README.md
+040000 tree 3d93078e51c26a71c8ae327563f4697e2499f8b9  chap05</code></pre>
+
+        <p><code>blob</code> はファイル，<code>tree</code> はフォルダを表しています．<br>
+        次に，<code>chap05</code> の tree を見ます：</p>
+<pre><code>git cat-file -p 3d93078</code></pre>
+
+        <p>表示例：</p>
+<pre><code>100644 blob 4f85fe54643cd789a66121d5dd9a65001548d738  PROFILE.md
+100644 blob 07ca40dbab5f2411f3d10f154699f02d1ac5da98  README.md</code></pre>
+
+        <p>最後に，<code>PROFILE.md</code> の blob を見ます：</p>
+<pre><code>git cat-file -p 4f85fe5</code></pre>
+
+        <p><strong>あなたが書いた自己紹介が表示されたら成功です！</strong><br>
+        コミットとは，「その時点のファイルの中身（blob）」と「フォルダ構造（tree）」をまとめて保存したセーブポイントなのです．</p>
+
+        <h3>9-4. parent をたどって過去にさかのぼる</h3>
+        <p>9-2で表示された <code>parent</code> のハッシュを見てみましょう：</p>
+<pre><code>git cat-file -p 6338599</code></pre>
+
+        <p>1回目のコミット「基本情報を追加」が表示されます．<br>
+        さらにその <code>parent</code> をたどると，先生のコミットまでさかのぼれます．<br>
+        コミットは，それぞれが1つ前のコミット（parent）を覚えていて，<strong>鎖のようにつながっている</strong>のです．これが「履歴」の正体です．</p>
+
+        <h3>発展：変更していないファイルはどうなっている？</h3>
+        <p>9-4で表示された1回目のコミットの <code>tree</code> を見て，9-3で見た2回目のコミットの tree と見比べてみましょう．</p>
+<pre><code>git cat-file -p fe1c447</code></pre>
+
+        <p>表示例：</p>
+<pre><code>100644 blob d0daf22f5c1640c3ac764729f62edce37f550837  LICENSE
+100644 blob c0d68e6f0da2f6e6cfed97b74937370c7686dc65  README.md
+040000 tree 29ea6ed3a19263a06de51d87b56b0a223aac546f  chap05</code></pre>
+
+        <p><code>LICENSE</code> や <code>README.md</code> の blob のハッシュは，2つのコミットで<strong>まったく同じ</strong>です．<br>
+        一方，<code>chap05</code> の tree のハッシュは違います．中にある <code>PROFILE.md</code> を書きかえたからです．<br>
+        Gitは，中身が同じファイルを何度も保存せず，同じ blob を使い回しています．<br>
+        そのため，何回コミットしてもリポジトリはあまり大きくなりません．</p>
+
+        <hr>
+
+        <!-- 困ったときは -->
+        <h2>困ったときは</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>症状</th>
+                    <th>原因と対処</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>ls: ../.git/objects: No such file or directory</code></td>
+                    <td><code>chap05</code> フォルダにいない可能性があります．<code>pwd</code> で今いる場所を確認しましょう</td>
+                </tr>
+                <tr>
+                    <td><code>fatal: not a git repository</code></td>
+                    <td>クローンしたフォルダの外にいるか，ZIPでダウンロードしています．手順1からやり直しましょう</td>
+                </tr>
+                <tr>
+                    <td><code>git status</code> で <code>nothing to commit</code> と出る</td>
+                    <td>エディタでファイルを保存し忘れていないか確認しましょう</td>
+                </tr>
+                <tr>
+                    <td><code>-m</code> を付け忘れて，見慣れない画面（Vim）が開いた</td>
+                    <td><code>Esc</code> キーを押してから <code>:q!</code> と入力し <code>Enter</code> で抜けられます．その後，<code>-m</code> を付けてやり直しましょう</td>
+                </tr>
+                <tr>
+                    <td><code>Author identity unknown</code> と出る</td>
+                    <td>手順6の名前とメールアドレスの設定をしましょう</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- まとめ -->
+        <h2>まとめ</h2>
+        <ul>
+            <li><strong><code>git status</code></strong>：変更されたファイルを確認</li>
+            <li><strong><code>git add</code></strong>：変更をステージング（コミット準備）．このとき中身が blob として保存される</li>
+            <li><strong><code>git commit -m "メッセージ"</code></strong>：変更を記録．tree と commit が作られる</li>
+            <li><strong><code>git log --oneline</code></strong>：コミット履歴を簡潔に表示</li>
+            <li><strong><code>git log -1</code></strong>：最新のコミットを詳しく表示</li>
+            <li><strong><code>ls ../.git/objects</code></strong>：Gitのデータ保存場所を確認</li>
+            <li><strong><code>git cat-file</code></strong>：コミットやファイルの中身を表示（<code>-t</code> で種類，<code>-p</code> で中身）</li>
+        </ul>
+
+        <p>これらのコマンドを使いこなせば，Gitの基本操作はバッチリです！</p>
+        <p>次回は，今日書いた <code>PROFILE.md</code> を生成AIに渡して，HTML/CSSのプロフィールサイトを作ります．</p>
+    </div>
 </body>
 </html>
